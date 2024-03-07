@@ -1,4 +1,4 @@
-// SavingsCalculator.js
+// SavingsCalculator.jsx
 
 import React, { useState, useEffect } from "react";
 import Chart from "chart.js/auto";
@@ -96,36 +96,67 @@ const SavingsCalculator = () => {
   };
 
   return (
-    <div className="savings-calculator">
-      <h2>How Long to Get a Million?</h2>
-      <label>
-        Monthly deposit:
-        <input
-          type="number"
-          value={monthlyDeposit}
-          onChange={(e) => setMonthlyDeposit(e.target.value)}
-        />
-      </label>
-      <label>
-        Annual interest rate (%):
-        <input
-          type="number"
-          value={interestRate}
-          onChange={(e) => setInterestRate(e.target.value)}
-        />
-      </label>
-      <button onClick={calculateMonthsToGoal}>Calculate</button>
+    <div>
+      {/* Savings Calculator Section */}
+      <div className="savings-calculator">
+        <h2>How Long to Get a Million?</h2>
+        <label>
+          Monthly deposit:
+          <input
+            type="number"
+            value={monthlyDeposit}
+            onChange={(e) => setMonthlyDeposit(e.target.value)}
+          />
+        </label>
+        <label>
+          Annual interest rate (%):
+          <input
+            type="number"
+            value={interestRate}
+            onChange={(e) => setInterestRate(e.target.value)}
+          />
+        </label>
+        <button onClick={calculateMonthsToGoal}>Calculate</button>
+        {result !== null && (
+          <div>
+            <p>
+              It will take approximately {result.years} years and{" "}
+              {result.remainingMonths} month(s) to reach one million.
+            </p>
+            <canvas id="savingsChart" width="400" height="200"></canvas>
+          </div>
+        )}
+      </div>
+
+      {/* YouTube Videos Section - Conditionally Rendered */}
       {result !== null && (
-        <div>
-          <p>
-            It will take approximately {result.years} years and{" "}
-            {result.remainingMonths} month(s) to reach one million.
-          </p>
-          <canvas id="savingsChart" width="400" height="200"></canvas>
+        <div className="videos-section">
+          <div className="video-container">
+            <h3>What 1 Million Dollars Can Buy in Chicago</h3>
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/ziRVIkJKP0U"
+              title="House in the USA"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <div className="video-container">
+            <h3>What 5 Million Reais Can Buy in Rio de Janeiro</h3>
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/OuN4NWdtUZw"
+              title="Real Estate in Brazil"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
         </div>
       )}
     </div>
   );
 };
-
 export default SavingsCalculator;
