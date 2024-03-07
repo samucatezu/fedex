@@ -1,14 +1,23 @@
 // SavingsCalculator.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Chart from "chart.js/auto";
 import "./SavingsCalculator.css";
 
 const SavingsCalculator = () => {
   const [monthlyDeposit, setMonthlyDeposit] = useState("");
   const [interestRate, setInterestRate] = useState("");
-  const [yearsToGoal, setYearsToGoal] = useState(null);
+  const [result, setResult] = useState(null);
+  const [chartInstance, setChartInstance] = useState(null);
 
-  const calculateYearsToGoal = () => {
+  useEffect(() => {
+    // Atualiza o gráfico sempre que o resultado for alterado
+    if (result) {
+      updateChart(result);
+    }
+  }, [result]);
+
+  const calculateMonthsToGoal = () => {
     const monthlyDepositFloat = parseFloat(monthlyDeposit);
     const interestRateFloat = parseFloat(interestRate) / 100;
 
@@ -18,9 +27,7 @@ const SavingsCalculator = () => {
       monthlyDepositFloat <= 0 ||
       interestRateFloat <= 0
     ) {
-      alert(
-        "Por favor, insira valores válidos para o depósito mensal e a taxa de juros."
-      );
+      alert("Please enter valid values for monthly deposit and interest rate.");
       return;
     }
 
@@ -29,29 +36,76 @@ const SavingsCalculator = () => {
 
     let monthsToGoal = 0;
     let currentBalance = 0;
+    const chartData = [];
 
     while (currentBalance < futureValue) {
       currentBalance =
         (currentBalance + monthlyDepositFloat) * (1 + monthlyInterestRate);
       monthsToGoal++;
+      chartData.push(currentBalance);
     }
 
-    const yearsToGoal = Math.floor(monthsToGoal / 12);
-    setYearsToGoal(yearsToGoal);
+    const years = Math.floor(monthsToGoal / 12);
+    const remainingMonths = monthsToGoal % 12;
+
+    setResult({ years, remainingMonths, chartData });
+  };
+
+  const updateChart = (result) => {
+    const ctx = document.getElementById("savingsChart").getContext("2d");
+
+    // Destrói manualmente a instância anterior do gráfico
+    if (chartInstance !== null) {
+      chartInstance.destroy();
+    }
+
+    const newChartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: Array.from(
+          { length: result.years * 12 + result.remainingMonths },
+          (_, i) => i + 1
+        ),
+        datasets: [
+          {
+            label: "Balance Over Time",
+            borderColor: "rgba(75, 192, 192, 1)",
+            data: result.chartData,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            ticks: {
+              stepSize: 12, // Mostra rótulos a cada 12 meses
+            },
+          },
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+
+    // Armazena a nova instância do gráfico
+    setChartInstance(newChartInstance);
   };
 
   return (
     <div className="savings-calculator">
       <h2>How Long to Get a Million?</h2>
       <label>
-        Amount deposited monthly:
+        Monthly deposit:
         <input
           type="number"
           value={monthlyDeposit}
           onChange={(e) => setMonthlyDeposit(e.target.value)}
         />
       </label>
-      <br />
       <label>
         Annual interest rate (%):
         <input
@@ -60,13 +114,15 @@ const SavingsCalculator = () => {
           onChange={(e) => setInterestRate(e.target.value)}
         />
       </label>
-      <br />
-      <button onClick={calculateYearsToGoal}>Calcular</button>
-      {yearsToGoal !== null && (
-        <p>
-          It will take approximately {yearsToGoal} years to put together a
-          million.
-        </p>
+      <button onClick={calculateMonthsToGoal}>Calculate</button>
+      {result !== null && (
+        <div>
+          <p>
+            It will take approximately {result.years} years and{" "}
+            {result.remainingMonths} month(s) to reach one million.
+          </p>
+          <canvas id="savingsChart" width="400" height="200"></canvas>
+        </div>
       )}
     </div>
   );
