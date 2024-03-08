@@ -1,5 +1,3 @@
-// SavingsCalculator.jsx
-
 import React, { useState, useEffect } from "react";
 import Chart from "chart.js/auto";
 import "./SavingsCalculator.css";
@@ -8,6 +6,7 @@ const SavingsCalculator = () => {
   const [monthlyDeposit, setMonthlyDeposit] = useState("");
   const [interestRate, setInterestRate] = useState("");
   const [result, setResult] = useState(null);
+  const [inflationRate, setInflationRate] = useState("");
   const [chartInstance, setChartInstance] = useState(null);
 
   useEffect(() => {
@@ -27,23 +26,29 @@ const SavingsCalculator = () => {
       monthlyDepositFloat <= 0 ||
       interestRateFloat <= 0
     ) {
-      alert("Please enter valid values for monthly deposit and interest rate.");
+      alert("Please enter valid values for monthly deposit, interest rate and inflation rate.");
       return;
     }
 
     const futureValue = 1000000; // Valor desejado
     const monthlyInterestRate = interestRateFloat / 12;
+    
 
     let monthsToGoal = 0;
     let currentBalance = 0;
+    let realFutureValue = futureValue;
+    const inflationRateFloat = parseFloat(inflationRate) / 100;
     const chartData = [];
 
-    while (currentBalance < futureValue) {
-      currentBalance =
-        (currentBalance + monthlyDepositFloat) * (1 + monthlyInterestRate);
+    while (currentBalance < realFutureValue) {
+      currentBalance = (currentBalance + monthlyDepositFloat) * (1 + monthlyInterestRate);
+
+      realFutureValue *= (1 + inflationRateFloat / 12);
+
       monthsToGoal++;
       chartData.push(currentBalance);
-    }
+  }
+
 
     const years = Math.floor(monthsToGoal / 12);
     const remainingMonths = monthsToGoal % 12;
@@ -116,12 +121,20 @@ const SavingsCalculator = () => {
             onChange={(e) => setInterestRate(e.target.value)}
           />
         </label>
+        <label>
+          Annual inflation rate (%):
+          <input
+            type="number"
+            value={inflationRate}
+            onChange={(e) => setInflationRate(e.target.value)}
+           />
+        </label>
         <button onClick={calculateMonthsToGoal}>Calculate</button>
         {result !== null && (
           <div>
             <p>
               It will take approximately {result.years} years and{" "}
-              {result.remainingMonths} month(s) to reach one million.
+              {result.remainingMonths} month(s) to reach one million adjusted by Inflation.
             </p>
             <canvas id="savingsChart" width="400" height="200"></canvas>
           </div>
