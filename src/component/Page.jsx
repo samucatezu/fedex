@@ -10,7 +10,7 @@ const SavingsCalculator = () => {
   const [chartInstance, setChartInstance] = useState(null);
 
   useEffect(() => {
-    // Atualiza o gráfico sempre que o resultado for alterado
+    // Update the chart whenever the result changes
     if (result) {
       updateChart(result);
     }
@@ -26,19 +26,20 @@ const SavingsCalculator = () => {
       monthlyDepositFloat <= 0 ||
       interestRateFloat <= 0
     ) {
-      alert("Please enter valid values for monthly deposit, interest rate and inflation rate.");
+      alert("Please enter valid values for monthly deposit, interest rate, and inflation rate.");
       return;
     }
 
-    const futureValue = 1000000; // Valor desejado
+    const futureValue = 1000000; // Desired value
     const monthlyInterestRate = interestRateFloat / 12;
-    
 
     let monthsToGoal = 0;
     let currentBalance = 0;
     let realFutureValue = futureValue;
     const inflationRateFloat = parseFloat(inflationRate) / 100;
     const chartData = [];
+    const nominalChartData = [];
+    const accumulatedValueData = []; // New array to store accumulated value without interest
 
     while (currentBalance < realFutureValue) {
       currentBalance = (currentBalance + monthlyDepositFloat) * (1 + monthlyInterestRate);
@@ -47,19 +48,20 @@ const SavingsCalculator = () => {
 
       monthsToGoal++;
       chartData.push(currentBalance);
-  }
-
+      nominalChartData.push(currentBalance);
+      accumulatedValueData.push(monthlyDepositFloat * monthsToGoal); // Accumulate value without interest
+    }
 
     const years = Math.floor(monthsToGoal / 12);
     const remainingMonths = monthsToGoal % 12;
 
-    setResult({ years, remainingMonths, chartData });
+    setResult({ years, remainingMonths, chartData, nominalChartData, accumulatedValueData });
   };
 
   const updateChart = (result) => {
     const ctx = document.getElementById("savingsChart").getContext("2d");
 
-    // Destrói manualmente a instância anterior do gráfico
+    // Destroy previous chart instance manually
     if (chartInstance !== null) {
       chartInstance.destroy();
     }
@@ -77,32 +79,48 @@ const SavingsCalculator = () => {
             borderColor: "rgba(75, 192, 192, 1)",
             data: result.chartData,
             fill: false,
+            
           },
+          {
+            label: "Accumulated Value Without Interest",
+            borderColor: "rgba(255, 99, 132, 1)",
+            data: result.accumulatedValueData, // Use accumulatedValueData here
+            fill: false,
+            
+          }
         ],
       },
       options: {
         scales: {
           x: {
-            type: "linear",
-            position: "bottom",
-            ticks: {
-              stepSize: 12, // Mostra rótulos a cada 12 meses
-            },
+            // ...
           },
           y: {
             beginAtZero: true,
-          },
+          }
         },
+        tooltips: {
+          enabled: true,
+          mode: 'index',
+          intersect: true,
+          callbacks: {
+            label: function(tooltipItem, data) {
+              const datasetIndex = tooltipItem.datasetIndex;
+              const value = data.datasets[datasetIndex].data[tooltipItem.index];
+              const label = data.datasets[datasetIndex].label;
+              return `${label}: $${value.toLocaleString()}`;
+            }
+          }
+        }
       },
     });
 
-    // Armazena a nova instância do gráfico
+    // Store the new chart instance
     setChartInstance(newChartInstance);
   };
 
   return (
     <div>
-      {/* Savings Calculator Section */}
       <div className="savings-calculator">
         <h2>How Long to Get a Million?</h2>
         <label>
@@ -127,7 +145,7 @@ const SavingsCalculator = () => {
             type="number"
             value={inflationRate}
             onChange={(e) => setInflationRate(e.target.value)}
-           />
+          />
         </label>
         <button onClick={calculateMonthsToGoal}>Calculate</button>
         {result !== null && (
@@ -172,4 +190,5 @@ const SavingsCalculator = () => {
     </div>
   );
 };
+
 export default SavingsCalculator;
