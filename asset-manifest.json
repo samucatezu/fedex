@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/fedex/static/css/main.f888a600.css",
-    "main.js": "/fedex/static/js/main.efa6d9b9.js",
+    "main.js": "/fedex/static/js/main.e9b69e6b.js",
     "index.html": "/fedex/index.html",
     "main.f888a600.css.map": "/fedex/static/css/main.f888a600.css.map",
-    "main.efa6d9b9.js.map": "/fedex/static/js/main.efa6d9b9.js.map"
+    "main.e9b69e6b.js.map": "/fedex/static/js/main.e9b69e6b.js.map"
   },
   "entrypoints": [
     "static/css/main.f888a600.css",
-    "static/js/main.efa6d9b9.js"
+    "static/js/main.e9b69e6b.js"
   ]
 }
