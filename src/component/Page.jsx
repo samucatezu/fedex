@@ -80,13 +80,13 @@ const SavingsCalculator = () => {
         ),
         datasets: [
           {
-            label: "Balance Over Time",
+            label: "Balance With interest Rate",
             borderColor: "rgba(75, 192, 192, 1)",
             data: result.chartData,
             fill: false,
           },
           {
-            label: "Accumulated Value Without Interest",
+            label: "Balance Without Interest Rate",
             borderColor: "rgba(255, 99, 132, 1)",
             data: result.accumulatedValueData,
             fill: false,
